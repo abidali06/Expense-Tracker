@@ -1,0 +1,637 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: white;
+    color: #1F2937;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0;
+    gap: 20px;
+    position: relative;
+}
+body > div {
+    width: 100%;
+}
+html, body {
+    height: 100%;
+}
+
+#heading h1 {
+    
+    color: white;
+    font-size: 2.3rem;
+    font-weight: 700;
+}
+#balance,
+#income,
+#expense,
+#transaction {
+    font-weight: bold;
+    background-color:white;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    padding: 20px;
+}
+#balanceAmount {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #2563EB;
+}
+#expensesAmount {
+    color: #DC2626;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+#incomeAmount {
+    color: #16A34A;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+#heading {
+    background-color: #143377;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: larger;
+    padding: 20px;
+}
+i {
+    font-size: 24px;
+    margin: 10px;
+}
+
+#dashboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+#balance {
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+
+
+
+}
+
+#ie {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+}
+#income, #expense {
+    width: 49%;
+    padding: 10px;
+
+    text-align: center;    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#add {
+    position: fixed;
+    bottom: 10%;
+    right: 50%;
+    transform: translate(50%, 50%);
+}
+#addbtn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #2563EB;
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(37,99,235,.35);
+
+    position: fixed;
+    bottom: 10%;
+    right: 50%;
+    transform: translate(50%, 50%);
+}
+#addwindow {
+    position: fixed;
+    bottom: 50%;
+    right: 50%;
+    transform: translate(50%, 50%);
+    padding: 10px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.15);
+    border: 1px solid #D1D5DB;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 50%;
+    height: auto;
+    min-height: 200px;
+ 
+}
+#addincome, #addexpense, #close1 {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+#aebtn, #aibtn, #closebtn1 {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    margin: 0px;
+    border: none;   
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bolder;
+    font-size: large;
+}
+#aibtn {
+    background-color: rgba(101, 189, 101, 0.548);
+}
+#aebtn {
+    background-color: rgb(168, 87, 87);
+}
+#closebtn1 {
+    background-color: rgb(201, 201, 173);
+}
+
+#overlay1 {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+}
+#overlay2 {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+}
+#addexpensewindow, #addincomewindow {
+    position: fixed;
+    bottom: 50%;
+    right: 50%;
+    transform: translate(50%, 50%);
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.15);
+    border: 1px solid #D1D5DB;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 50%;
+    height: 30%;
+    background-color: rgba(240, 255, 255, 0.788);
+}
+#addincomewindow > div {
+    width: 100%;
+    height: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: large;
+    font-weight: bold;
+}
+#addexpensewindow > div {
+    width: 100%;
+    height: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: large;
+    font-weight: bold;
+}
+#buttons2 > button {
+    font-weight: bolder;
+    font-size: large;
+    border-radius: 5px;
+}
+#buttons3 > button {
+    font-weight: bolder;
+    font-size: large;
+    border-radius: 5px;
+}
+#savebtn2, #savebtn3 {
+    background-color: lightblue;
+}
+#closebtn2, #closebtn3 {
+    background-color: beige;
+}
+#overlay3 {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+}
+
+#transactionList {
+    width: 100%;
+    border: 1px solid #D1D5DB;
+    border-radius: 5px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    overflow: visible;
+    flex: none;
+    min-height: 0;
+    padding-top: 0;
+}
+#dashboard {
+    flex-shrink: 0;
+}
+
+#transaction {
+    text-align: center;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1;
+}
+.transactionItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #D1D5DB;
+    width: 100%;
+    background-color: white;
+  
+}
+.transactionDetails {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10%;
+}
+.expenseamount {
+    color: red;
+}
+.incomeamount {
+    color: green;
+}
+#transactionHeader {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    gap: 10%;
+    border-bottom: 1px solid #D1D5DB;
+    background: #2563EB;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+#transactionHeader > div {
+    width: 100px;
+    text-align: center;
+}
+.transactionCategory, .transactionDescription, .transactionDate, .transactionAmount {
+    width: 100px;
+    text-align: center;
+}
+.transactionItem:hover {
+    background: #EFF6FF;
+}
+input,
+select {
+    padding: 10px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+}
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #2563EB;
+}
+#balance, #income, #expense, #transaction {
+    transition: box-shadow 0.3s ease;
+}
+#balance:hover, #income:hover, #expense:hover, #transaction:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,.15);
+}
+#addbtn:hover {
+    background-color: #1E40AF;
+}
+#savebtn2:hover, #savebtn3:hover {
+    background-color: #1E40AF;
+}
+#closebtn2:hover, #closebtn3:hover {
+    background-color: #D1D5DB;
+}
+#closebtn1:hover {
+    background-color: #D1D5DB;
+}
+#aebtn:hover, #aibtn:hover {
+    opacity: 0.8;
+}
+#transactionTitle {
+    display: flex;
+    justify-content: center;
+    gap: 50%;
+    align-items: center;
+    width: 100%;
+    padding: 0 10px;
+    position: relative;
+}
+#deleteTransaction {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 4%;
+}
+#deletebtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+#deletebtn:hover .delete-icon {
+    color: #DC2626;
+}
+#deletebtn:active .delete-icon {
+    transform: scale(0.9);
+}
+#confirmDeleteBtn {
+    background-color: #DC2626;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#confirmDeleteBtn:hover {
+    background-color: rgb(187, 96, 96);
+}
+#confirmDeleteBtn:active {
+    background-color: red;
+}
+#cancelDeleteBtn {
+    background-color: #D1D5DB;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+#cancelDeleteBtn:hover {
+    background-color: #eff1f3;
+}
+
+#cancelDeleteBtn:active {
+    background-color: gray;
+}
+#emptymsg {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #6B7280;
+    flex:1;
+    min-height: 0;
+    overflow-y: auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#reportBtn {
+    position: fixed;
+    top: 90%;
+    right: 5%;
+    font-size: larger;
+    font-weight: bold;
+    box-shadow: #6B7280;
+    border: none;
+    cursor: pointer;
+    padding: 15px;
+    background-color: #70b489;
+    border-radius: 10px;
+}
+#reportBtn:hover {
+    background-color:#9bd6b0
+}
+#reportBtn:active{
+    background-color: #6d9c7e;
+}
+#reportPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background: white;
+    color: #000;
+    gap: 3%;
+    min-height: 100vh;
+    margin-bottom: 50px;
+    position: fixed;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#reportHeader {
+    background-color: #49795a;
+    color: white;
+    width: 100%;
+    text-align: center;
+
+}
+#expenseStats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+
+}
+.expenseStats {
+    font-weight: bold;
+    font-size: small;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    padding: 30px;
+    padding-top: 0;
+    width: 33%;
+    height: 100%;
+}
+.reportValues {
+    color: red;
+    font-size: 40px;
+    font-weight: bolder;
+}
+#freqCategory, #largestCategory {
+    font-size: 40px;
+    font-weight: bolder;
+    color: blue;
+}
+#lt {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-weight: bold;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    padding: 20px;
+}
+#lt > div {
+    width: 33%;
+    text-align: center;
+    
+}
+#ltText {
+    font-size: 20px;
+    
+}
+#ltIncome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgb(194, 186, 186);
+    border-left: 1px solid rgb(194, 186, 186);
+}
+#ltIncVal {
+    font-weight: bolder;
+    font-size: 50px;
+    color: green;
+}
+#ltExpVal {
+    font-weight: bolder;
+    font-size: 50px;
+    color: red;
+}
+#chartCaption {
+    border-bottom: 1px solid grey;
+}
+#dashBtn {
+    position: fixed;
+    top: 90%;
+    right: 5%;
+    font-size: larger;
+    font-weight: bold;
+    box-shadow: #6B7280;
+    border: none;
+    cursor: pointer;
+    padding: 15px;
+    background-color: #2a4f9e;
+    border-radius: 10px;
+}
+#dashBtn:hover {
+    background-color:#3c5ca0;
+}
+#dashBtn:active{
+    background-color: #2b55af;
+}
+#chartContainer {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    height: 600px;
+    flex-shrink: 0;
+    margin: 0 auto;
+}
+#onlyIncome {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 10%;
+}
+#ltNdPer {
+    display: flex;
+    gap: 1%;
+    width: 100%;
+    height: 200px;
+    text-align: center;
+    justify-content: center;
+}
+#ltNdPer > div {
+    width: 50%;
+    text-align: center;
+    height: 100%;
+    font-size: larger;
+}
+#balDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: larger;
+    height: 200px;
+}
+#bal {
+    color: blue;
+    font-weight: bolder;
+    font-size: 40px;
+}
+#ltOi {
+    color: green;
+    font-weight: bolder;
+    font-size: 40px;
+}
+#per {
+    color: red;
+    font-weight: bolder;
+    font-size: 40px;
+}
+#oiMsgDiv {
+    flex: 1;
+    display: flex;
+
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+#oiMsg {
+    position: absolute;
+    top: 30%;
+    width: 100%;
+    color: gray;
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+        <title>ExpenseTracker</title>
+    </head>
+    <body>
+            <div id="dashboardHeader" class="dash">
+                <div id = "heading">
+                    <h1>Dashboard</h1>
+                </div>
+            </div>
+            <div id="dashboard" class="dash">
+                <div id="balance">
+                    <h2>Balance</h2>
+                    <p id="balanceAmount"></p>
+                </div>
+                <div id="ie">
+                    <div id="income">
+                        <h2>Income</h2>
+                        <p id="incomeAmount"></p>
+                    </div>
+                    <div id="expense">
+                        <h2>Expenses</h2>
+                        <p id="expensesAmount"></p>
+                    </div>
+                </div>
+            </div>
+            <div id="transaction" class="dash">
+                <div id="transactionTitle">
+                    <div><h2 id="transactionh2">Transactions</h2></div>
+                    <div id ="deleteTransaction">
+                        <button id="deletebtn">
+                            <i class="fa-solid fa-trash delete-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="transactionHeader">
+                    <div><h3>Category</h3></div>
+                    <div><h3>Description</h3></div>
+                    <div><h3>Date</h3></div>
+                    <div><h3>Amount</h3></div>
+                </div>
+                <div id="transactionList">
+                    
+                </div>
+                <div id="emptymsg">
+                    <h1 id="noTransactions">No transactions yet.<br>Click on the "+" button to add one.</h1>
+                </div>
+            </div>
+            <div id="add" class="dash"><button id="addbtn">+</button></div>
+            <div id="overlay1" class="dash">
+                <div id="addwindow">
+                    <div id="addincome"><button id="aibtn">Add Income</button></div>
+                    <div id="addexpense"><button id="aebtn">Add Expense</button></div>
+                    <div id="close1"><button id="closebtn1">Close</button></div>
+                </div>
+            </div>
+            <div id="overlay2" class="dash">
+                <div id="addexpensewindow">
+                    <div>
+                        <label for="expcategory">Category:</label>
+                        <select id="expcategory">
+                            <option value="" selected disabled>Select a category</option>
+                            <option>Food</option>
+                            <option>Transport</option>
+                            <option>Shopping</option>
+                            <option>Bills</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="expamount">Amount:</label>
+                        <input type="number" id="expamount" placeholder="Enter amount">
+                    </div>
+                    <div>
+                        <label for="expdescription">Description:</label>
+                        <input type="text" id="expdescription" placeholder="Enter description">
+                    </div>
+                    <div>
+                        <label for="date">Date:</label>
+                        <input type="text" id="expdate" placeholder="Select date">
+                    </div>
+                    <div id="buttons2">
+                        <button id="closebtn2">Close</button>
+                        <button id="savebtn2">Save</button>
+                    </div>
+                </div>
+            </div>
+            <div id="overlay3" class="dash">
+                <div id="addincomewindow">
+                    <div>
+                        <label for="inccategory">Category</label>
+                        <select id="inccategory">
+                            <option value="" selected disabled>Select a category</option>
+                            <option>salary</option>
+                            <option>Freelance</option>
+                            <option>Gifts</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="incamount">Amount</label>
+                        <input type="number" id="incamount" placeholder="Enter amount">
+                    </div>
+                    <div>
+                        <label for="incdescription">Description</label>
+                        <input type="text" id="incdescription" placeholder="Enter description">
+                    </div>
+                    <div>
+                        <label for="date">Date</label>
+                        <input type="text" id="incdate" placeholder="Select date">
+                    </div>
+                    <div id="buttons3">
+                        <button id="closebtn3">Close</button>
+                        <button id="savebtn3">Save</button>
+                    </div>
+                </div>
+            </div> 
+            <div id="report" class="dash">
+                <button id="reportBtn">Report</button>
+            </div>    
+            <div id="reportPage">
+                <div id="reportHeader">
+                    <h1>Report & Analysis</h1>
+                </div>
+                <div id="expenseStats" class="rep">
+                    <div class="expenseStats">
+                        <div id="largestCategoryTitle"><h2>Category with largest total expense</h2></div>
+                        <div id="largestCategory"></div>
+                        <div id="largestCategoryValue" class="reportValues"></div>
+                    </div>
+                    <div id="percentSpentDiv" class="expenseStats">
+                        <h2>
+                            Income spent<br>
+                            <span id="percentSpentValueDiv" class="reportValues"><span id="percentSpentValue"></span>
+                        </h2>
+                    </div>
+                    <div class="expenseStats">
+                        <div id="freqCategoryTitle"><h2>Category with most frequent expenses</h2></div>
+                        <div id="freqCategory"></div>
+                        <div id="freqCategoryValueDiv" class="reportValues"><span id="freqCategoryValue"></span> Times</div>
+                    </div>
+                </div>
+                <div id="lt" class="rep">
+                    <div id="ltText"><h2>Largest transactions:</h2></div>
+                    <div id="ltIncome">
+                        <div id="ltIncDes"></div>
+                        <div id="ltIncVal"></div>
+                    </div>
+                    <div id="ltExpense">
+                        <div id="ltExpDes"></div>
+                        <div id="ltExpVal"></div>
+                    </div>
+                </div>
+                <div id="chartContainer" class="rep">
+                    <canvas id="myChart"></canvas>
+                </div>
+                <div id="chartCaption" class="rep">
+                    <h2>Spending by category</h2>
+                </div>
+                <div id="txtDiv"></div>
+                <div id="onlyIncome">
+                    <div id="ltNdPer">
+                        <div id="ltOiDiv" class="expenseStats">
+                            <h2>
+                                Largest transaction: <span id="ltOi"></span>
+                            </h2>
+                        </div>
+                        <div id="perDiv" class="expenseStats">
+                            <h2>
+                                Income spent: <span id="per">0%</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div id="balDiv" class="expenseStats">
+                        <h2>
+                            Balance: <span id="bal"></span>
+                        </h2>
+                    </div>
+                    <div id="oiMsgDiv">
+                        <h2 id="oiMsg">Start adding expenses to see all the stats.</h2>
+                    </div>
+                </div>
+                <div id="dashButton">
+                    <button id="dashBtn">Dashboard</button>
+                </div>
+                
+            </div> 
+
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
