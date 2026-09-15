@@ -429,7 +429,7 @@ select:focus {
     min-height: 0;
     overflow-y: auto;
     text-align: center;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
 }
@@ -497,7 +497,7 @@ select:focus {
 }
 .reportValues {
     color: red;
-    font-size: 40px;
+    font-size: 38px;
     font-weight: bolder;
 }
 #freqCategory, #largestCategory {
@@ -536,16 +536,17 @@ select:focus {
 }
 #ltIncVal {
     font-weight: bolder;
-    font-size: 50px;
+    font-size: 40px;
     color: green;
 }
 #ltExpVal {
     font-weight: bolder;
-    font-size: 50px;
+    font-size: 40px;
     color: red;
 }
 #chartCaption {
     border-bottom: 1px solid grey;
+    display: block;
 }
 #dashBtn {
     position: fixed;
@@ -564,7 +565,7 @@ select:focus {
     background-color:#3c5ca0;
 }
 #dashBtn:active{
-    background-color: #2b55af;
+    background-color: #1e4caf;
 }
 #chartContainer {
     position: relative;
@@ -573,6 +574,7 @@ select:focus {
     height: 600px;
     flex-shrink: 0;
     margin: 0 auto;
+    margin-top: 70px;
 }
 #onlyIncome {
     display: none;
@@ -634,4 +636,8 @@ select:focus {
     top: 30%;
     width: 100%;
     color: gray;
+    display: none;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
 }

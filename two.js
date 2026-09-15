@@ -42,6 +42,9 @@ const txtDiv = document.getElementById("txtDiv");
 const onlyIncome = document.getElementById("onlyIncome"); 
 const repDivs = document.querySelectorAll(".rep");
 const onlyIncomeMsg = document.getElementById("oiMsg");
+const previousMonthBtn = document.getElementById("previousMonthBtn");
+const nextMonthBtn = document.getElementById("nextMonthBtn");
+const selectedMonthText = document.getElementById("selectedMonthText");
 
 
 reportPage.style.display = "none";
@@ -50,6 +53,10 @@ txtDiv.style.display = "none";
 flatpickr("#expdate");
 flatpickr("#incdate");
 
+
+const transactionobjects = [];
+
+
 const currency = "₹";
 balanceamount.textContent = `${currency}0.00`;
 incomeamount.textContent = `${currency}0.00`;
@@ -57,9 +64,7 @@ expensesamount.textContent = `${currency}0.00`;
 
 
 let deleteMode = false;
-
-
-const transactionobjects = [];
+let selectedMonth = new Date();
 
 
 
@@ -87,11 +92,11 @@ function fetchTransactions() {
     }
 }
 
-function getTotalExpenses() {
+function getTotalExpenses(transactions) {
 
     let totalExpense = 0;
 
-    transactionobjects.forEach(transaction => {
+    transactions.forEach(transaction => {
 
         if (transaction.type === 'expense') {
 
@@ -104,11 +109,12 @@ function getTotalExpenses() {
     return totalExpense;
 }
 
-function getTotalIncome() {
+
+function getTotalIncome(transactions) {
 
     let totalIncome = 0;
 
-    transactionobjects.forEach(transaction => {
+    transactions.forEach(transaction => {
 
         if (transaction.type === 'income') {
 
@@ -673,6 +679,33 @@ function renderReport() {
 
 
 // =========================
+// MONTH SELECTION FUNCTIONS
+// =========================
+function renderSelectedMonth() {
+    selectedMonthText.textContent =
+        selectedMonth.toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric"
+        });
+}
+
+
+function getSelectedMonth() {
+    return `${selectedMonth.getFullYear()}-${String(
+        selectedMonth.getMonth() + 1
+    ).padStart(2, '0')}`;
+}
+
+
+function getTransactionsForMonth(month) {
+    return transactionobjects.filter(transaction =>
+        transaction.date.startsWith(month)
+    );
+}
+
+
+
+// =========================
 // EVENT LISTENERS
 // =========================
 
@@ -755,6 +788,26 @@ dashBtn.addEventListener("click", () => {
     reportPage.style.display = "none";
 });
 
+// =========================
+// MONTH SELECTION EVENT LISTENERS
+// =========================
+
+previousMonthBtn.addEventListener("click", () => {
+    selectedMonth.setMonth(selectedMonth.getMonth() - 1);
+
+    renderSelectedMonth();
+});
+
+nextMonthBtn.addEventListener("click", () => {
+    selectedMonth.setMonth(selectedMonth.getMonth() + 1);
+
+    renderSelectedMonth();
+});
+
+renderSelectedMonth();
+
+
+
 
 // Key-value pairs
 const expenses = {
@@ -809,4 +862,20 @@ let expenseChart = new Chart(ctx, {
 
 // add sorting of transactions, date features, handle tie in report stats
 
-     
+     <div id="monthSelector">
+        <button id="previousMonthBtn">&lt;</button>
+
+        <span id="selectedMonthText">September 2026</span>
+
+        <button id="nextMonthBtn">&gt;</button>
+     </div>
+
+     #monthSelector {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: larger;
+}
