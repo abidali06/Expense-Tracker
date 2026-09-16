@@ -14,7 +14,13 @@
                 <div id = "heading">
                     <h1>Dashboard</h1>
                 </div>
-                
+                <div id="monthSelector">
+                    <button id="previousMonthBtn">&lt;</button>
+
+                    <span id="selectedMonthText">September 2026</span>
+
+                    <button id="nextMonthBtn">&gt;</button>
+                </div>
             </div>
             <div id="dashboard" class="dash">
                 <div id="balance">
@@ -171,6 +177,7 @@
                             <h2>
                                 Largest transaction: <span id="ltOi"></span>
                             </h2>
+                            <h3 id="ltOiDes"></h3>
                         </div>
                         <div id="perDiv" class="expenseStats">
                             <h2>

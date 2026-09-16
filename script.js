@@ -1,10 +1,9 @@
+//#region DOM ELEMENTS Assignments
 const addBtn = document.getElementById('addbtn');
 const overlay1 = document.getElementById('overlay1');
 const addIncomeBtn = document.getElementById('aibtn');
 const addExpenseBtn = document.getElementById('aebtn');
 const overlay2 = document.getElementById('overlay2');
-const addExpenseWindow = document.getElementById('addexpensewindow');
-const addIncomeWindow = document.getElementById('addincomewindow');
 const balanceamount = document.getElementById('balanceAmount');
 const incomeamount = document.getElementById('incomeAmount');
 const expensesamount = document.getElementById('expensesAmount');
@@ -42,13 +41,27 @@ const txtDiv = document.getElementById("txtDiv");
 const onlyIncome = document.getElementById("onlyIncome"); 
 const repDivs = document.querySelectorAll(".rep");
 const onlyIncomeMsg = document.getElementById("oiMsg");
+const ltOiDes = document.getElementById("ltOiDes");
+const previousMonthBtn = document.getElementById("previousMonthBtn");
+const nextMonthBtn = document.getElementById("nextMonthBtn");
+const selectedMonthText = document.getElementById("selectedMonthText");
+//#endregion
 
 
-reportPage.style.display = "none";
-txtDiv.style.display = "none";
+//=========================
+// INITIAL SETUP
+//=========================
+
+reportPage.style.display = "none"; // hides the report page initially, so that the user sees the main dashboard when they first open the application.
+txtDiv.style.display = "none"; // hides the text div that displays messages in the report page, as it will only be shown when there are no transactions to report.
 
 flatpickr("#expdate");
-flatpickr("#incdate");
+flatpickr("#incdate"); // initializes the date picker for the expense and income date input fields using the Flatpickr library, allowing users to easily select dates for their transactions.
+
+let selectedMonth = new Date(); 
+renderSelectedMonth(); // updates the UI to display the currently selected month, which is initialized to the current date when the application is first loaded.
+updateNextMonthButton(); // disables the "Next Month" button if the currently selected month is the same as the current month, preventing users from navigating to future months.
+
 
 const currency = "₹";
 balanceamount.textContent = `${currency}0.00`;
@@ -59,13 +72,19 @@ expensesamount.textContent = `${currency}0.00`;
 let deleteMode = false;
 
 
-const transactionobjects = [];
+const transactionobjects = []; //main array for storing all transactions.
 
 
 
-fetchTransactions();  // also handles rendering and stats update
-checkNoTransactions();
+fetchTransactions();  // fetches transactions from local storage and renders them on the UI, as well as updating the stats for the selected month.
+checkNoTransactions(); // checks if there are any transactions for the selected month and shows or hides the "no transactions" message accordingly.
 
+
+
+
+// ===============================
+// transaction and stats functions
+// ===============================
 
 
 function updateLocalStorage() {
@@ -85,13 +104,13 @@ function fetchTransactions() {
 
         updateAndRenderStats();
     }
-}
+} // also handles rendering and stats update
 
-function getTotalExpenses() {
+function getTotalExpenses(transactions) {
 
     let totalExpense = 0;
 
-    transactionobjects.forEach(transaction => {
+    transactions.forEach(transaction => {
 
         if (transaction.type === 'expense') {
 
@@ -104,11 +123,12 @@ function getTotalExpenses() {
     return totalExpense;
 }
 
-function getTotalIncome() {
+
+function getTotalIncome(transactions) {
 
     let totalIncome = 0;
 
-    transactionobjects.forEach(transaction => {
+    transactions.forEach(transaction => {
 
         if (transaction.type === 'income') {
 
@@ -121,34 +141,43 @@ function getTotalIncome() {
     return totalIncome;
 }
 
-function getStats() {
+function getStats(transactions) {
 
-    const totalIncome = getTotalIncome();
+    const totalIncome = getTotalIncome(transactions);
 
-    const totalExpense = getTotalExpenses();
+    const totalExpense = getTotalExpenses(transactions);
 
     const currentBalance = totalIncome - totalExpense;
 
     return { totalIncome, totalExpense, currentBalance };
-
-}
+} // returns an object with totalIncome, totalExpense, and currentBalance
     
 function updateAndRenderStats() {
 
-    const { totalIncome, totalExpense, currentBalance } = getStats();
+    const monthlyTransactions =
+        getTransactionsForMonth(getSelectedMonth());
 
-    balanceamount.textContent = `${currency}${currentBalance.toFixed(2)}`;
+    const { totalIncome, totalExpense, currentBalance } =
+        getStats(monthlyTransactions);
 
-    incomeamount.textContent = `${currency}${totalIncome.toFixed(2)}`;
+    balanceamount.textContent =
+        `${currency}${currentBalance.toFixed(2)}`;
 
-    expensesamount.textContent = `${currency}${totalExpense.toFixed(2)}`;
-}
+    incomeamount.textContent =
+        `${currency}${totalIncome.toFixed(2)}`;
+
+    expensesamount.textContent =
+        `${currency}${totalExpense.toFixed(2)}`;
+} 
 
 function renderTransactions() {
 
     transactionList.innerHTML = '';
 
-    const sortedTransactions = [...transactionobjects].sort(
+    const monthlyTransactions =
+        getTransactionsForMonth(getSelectedMonth());
+
+    const sortedTransactions = [...monthlyTransactions].sort(
         (a, b) => b.date.localeCompare(a.date)
     );
 
@@ -170,7 +199,7 @@ function renderTransactions() {
 
         transactionList.appendChild(transactionItem);
     });
-}
+} // gets selected month from a function, gets transactions for that month using another function, sorts them by date, and renders them
 
 function addTransaction(type, amountInput, categoryInput, descriptionInput, dateInput, overlay) {
 
@@ -201,11 +230,8 @@ function addTransaction(type, amountInput, categoryInput, descriptionInput, date
 
 
     updateLocalStorage();
-
     updateAndRenderStats();
-
     renderTransactions();
-
     checkNoTransactions();
 
     amountInput.value = '';
@@ -214,20 +240,23 @@ function addTransaction(type, amountInput, categoryInput, descriptionInput, date
     dateInput.value = '';
 
     overlay.style.display = 'none';
-}
+} // extracts and validates input from forms, creates a transaction object, updates local storage, stats, and UI, resets the form, and closes the overlay.
 
 
 function checkNoTransactions() {
 
-    if (transactionobjects.length === 0) {
+    const monthlyTransactions =
+        getTransactionsForMonth(getSelectedMonth());
 
+    if (monthlyTransactions.length === 0) {
         noTransactionsText.style.display = 'flex';
-
     } else {
-
         noTransactionsText.style.display = 'none';
     }
-}
+} // checks if there are transactions for the selected month and shows or hides the "no transactions" message accordingly.
+
+
+
 
 // =========================
 // DELETE MODE FUNCTIONS
@@ -243,7 +272,7 @@ function handleTransactionClick(event) {
     } else {
         transactionItem.style.backgroundColor = 'rgb(223, 140, 140)';
     }
-}
+} // when in delete mode, clicking a transaction toggles its background color to indicate selection for deletion.
 
 
 function setupTransactionClickListeners() {
@@ -253,7 +282,7 @@ function setupTransactionClickListeners() {
     transactionItems.forEach(item => {
         item.addEventListener('click', handleTransactionClick);
     });
-}
+} // adds click event listeners to all transaction items, enabling the selection of transactions for deletion when in delete mode.
 
 
 function createDeleteControls() {
@@ -284,7 +313,7 @@ function createDeleteControls() {
         'click',
         cancelDeleteMode
     );
-}
+} // creates "Confirm Delete" and "Cancel" buttons and sets up their respective event listeners using fuctions defined below.
 
 
 function enterDeleteMode() {
@@ -298,7 +327,7 @@ function enterDeleteMode() {
 
     setupTransactionClickListeners();
     createDeleteControls();
-}
+} // disables the delete button, sets delete mode to true, updates tui for delete mode, and calls functions to set up click listeners and create delete controls.
 
 
 function cancelDeleteMode() {
@@ -322,7 +351,7 @@ function cancelDeleteMode() {
 
     document.getElementById("confirmDeleteBtn")?.remove();
     document.getElementById("cancelDeleteBtn")?.remove();
-}
+} // cancels delete mode, resets the background color of all transaction items, removes click event listeners, re-enables the delete button, removes delete mode ui and the confirm and cancel buttons.
 
 
 function deleteSelectedTransactions() {
@@ -349,28 +378,27 @@ function deleteSelectedTransactions() {
     updateAndRenderStats();
     cancelDeleteMode();
     checkNoTransactions();
-}
+} // deletes all selected transactions, updates local storage, re-renders the transaction list and stats, cancels delete mode, and checks if there are any transactions left for the selected month to show or hide the "no transactions" message accordingly.
+
+
+
 
 
 // =========================
 // REPORT DATA HELPERS
 // =========================
 
-function getIncomeTransactions() {
-
-    return transactionobjects.filter(
+function getIncomeTransactions(transactions) {
+    return transactions.filter(
         transaction => transaction.type === 'income'
     );
-}
+} // returns a list of all income transactions from the provided list of transactions.
 
-
-function getExpenseTransactions() {
-
-    return transactionobjects.filter(
+function getExpenseTransactions(transactions) {
+    return transactions.filter(
         transaction => transaction.type === 'expense'
     );
-}
-
+} // returns a list of all expense transactions from the provided list of transactions.
 
 function getLargestTransaction(transactions) {
 
@@ -389,7 +417,7 @@ function getLargestTransaction(transactions) {
         value: largestValue,
         description: largestDescription
     };
-}
+} // returns an object containing the value and description of the largest transaction from the provided list of transactions.
 
 
 function getCategoryFrequency(transactions) {
@@ -406,7 +434,7 @@ function getCategoryFrequency(transactions) {
     });
 
     return occurrence;
-}
+} // returns an object where each key is a category and its value is the number of times that category appears in the provided list of transactions.
 
 
 function getMostFrequentCategory(transactions) {
@@ -428,7 +456,7 @@ function getMostFrequentCategory(transactions) {
         category: mostFrequentCategory,
         frequency: highestFrequency
     };
-}
+} // returns an object containing the category that appears most frequently in the provided list of transactions and its frequency count.
 
 
 function getExpensesByCategory(transactions) {
@@ -445,7 +473,7 @@ function getExpensesByCategory(transactions) {
     });
 
     return totalExpenses;
-}
+} // returns an object where each key is a category and its value is the total amount spent in that category from the provided list of transactions.
 
 
 function getLargestExpenseCategory(expensesByCategory) {
@@ -465,20 +493,23 @@ function getLargestExpenseCategory(expensesByCategory) {
         category: highestCategory,
         value: highestTotal
     };
-}
+} // returns an object containing the category with the highest total expense and its corresponding value from the provided object of getExpensesByCategory.
 
 
-function getPercentageSpent() {
+function getPercentageSpent(transactions) {
 
-    const totalIncome = getTotalIncome();
-    const totalExpense = getTotalExpenses();
+    const totalIncome = getTotalIncome(transactions);
+    const totalExpense = getTotalExpenses(transactions);
 
     if (totalIncome === 0) {
         return null;
     }
 
     return (totalExpense * 100) / totalIncome;
-}
+} // returns the percentage of income that has been spent based on the provided list of transactions. If there is no income, it returns null.
+
+
+
 
 
 // =========================
@@ -499,16 +530,17 @@ function showEmptyReport() {
     txtDiv.style.marginTop = "10%";
     txtDiv.style.color = "gray";
     txtDiv.style.display = "block";
-}
+} // hides all report divs and displays a message prompting the user to add a transaction to get started with the report.
 
 
-function showOnlyIncomeReport() {
+function showOnlyIncomeReport(transactions) {
 
     repDivs.forEach(div => {
         div.style.display = "none";
     });
 
-    const incomeTransactions = getIncomeTransactions();
+    const incomeTransactions = getIncomeTransactions(transactions);
+
     const largestIncome =
         getLargestTransaction(incomeTransactions);
 
@@ -517,11 +549,11 @@ function showOnlyIncomeReport() {
 
     ltOi.textContent =
         `${currency}${largestIncome.value.toFixed(2)}`;
-
+    ltOiDes.textContent = largestIncome.description;
     bal.textContent = balanceamount.textContent;
     onlyIncomeMsg.style.display = "flex";
     onlyIncome.style.display = "flex";
-}
+} // hides all report divs, calculates the largest income transaction, and displays the largest income and current balance in a message indicating that there are only income transactions for the selected month.
 
 
 function showNormalReport() {
@@ -529,7 +561,7 @@ function showNormalReport() {
     repDivs.forEach(div => {
         div.style.display = "flex";
     });
-}
+} // displays all report divs, indicating that there are both income and expense transactions for the selected month.
 
 
 function renderLargestTransactions(
@@ -546,30 +578,30 @@ function renderLargestTransactions(
 
     ltIncVal.textContent =
         `${currency}${largestIncome.value.toFixed(2)}`;
-}
+} // updates the report UI to display the description and value of the largest income and expense transactions for the selected month.
 
 
-function renderMostFrequentCategory() {
+function renderMostFrequentCategory(transactions) {
 
-    const expenseTransactions = getExpenseTransactions();
+    const expenseTransactions =
+        getExpenseTransactions(transactions);
 
     const result =
         getMostFrequentCategory(expenseTransactions);
 
     freqCategory.textContent = result.category;
     freqCategoryValue.textContent = result.frequency;
-}
+} // updates the report UI to display the most frequent expense category and its frequency for the selected month.
 
 
-function renderPercentageSpent() {
+function renderPercentageSpent(transactions) {
 
-    const percentageSpent = getPercentageSpent();
+    const percentageSpent =
+        getPercentageSpent(transactions);
 
     if (percentageSpent === null) {
-
         percentSpentValue.textContent = "No income yet";
         percentSpentValue.style.color = "gray";
-
         return;
     }
 
@@ -577,12 +609,13 @@ function renderPercentageSpent() {
 
     percentSpentValue.textContent =
         `${percentageSpent.toFixed(2)}%`;
-}
+} // updates the report UI to display the percentage of income that has been spent for the selected month. If there is no income, it displays a message indicating that there is no income yet and styles the text in gray.
 
 
-function renderExpenseChart() {
+function renderExpenseChart(transactions) {
 
-    const expenseTransactions = getExpenseTransactions();
+    const expenseTransactions =
+        getExpenseTransactions(transactions);
 
     const expensesByCategory =
         getExpensesByCategory(expenseTransactions);
@@ -596,7 +629,7 @@ function renderExpenseChart() {
     expenseChart.update();
 
     return expensesByCategory;
-}
+} // updates the expense chart in the report UI to display the total expenses by category for the selected month. It retrieves the expense transactions, calculates the total expenses by category, updates the chart's labels and data, and then refreshes the chart. It also returns the expenses by category for further use in other report functions.
 
 
 function renderLargestExpenseCategory(expensesByCategory) {
@@ -609,7 +642,9 @@ function renderLargestExpenseCategory(expensesByCategory) {
 
     largestCategoryValue.textContent =
         `${currency}${result.value.toFixed(2)}`;
-}
+} // updates the report UI to display the category with the highest total expense and its corresponding value for the selected month. It retrieves the largest expense category from the provided expenses by category object and updates the relevant UI elements with the category name and formatted value.
+
+
 
 
 // =========================
@@ -618,29 +653,32 @@ function renderLargestExpenseCategory(expensesByCategory) {
 
 function renderReport() {
 
+    const monthlyTransactions =
+        getTransactionsForMonth(getSelectedMonth());
+
     const incomeTransactions =
-        getIncomeTransactions();
+        getIncomeTransactions(monthlyTransactions);
 
     const expenseTransactions =
-        getExpenseTransactions();
+        getExpenseTransactions(monthlyTransactions);
 
 
     // No transactions
-    if (transactionobjects.length === 0) {
+    if (monthlyTransactions.length === 0) {
 
-        showEmptyReport();
+    showEmptyReport();
 
-        return;
+    return;
     }
 
 
     // Only income
     if (expenseTransactions.length === 0) {
 
-        showOnlyIncomeReport();
-
-        return;
-    }
+    showOnlyIncomeReport(monthlyTransactions);
+    
+    return;
+}
 
 
     // Income + expenses
@@ -659,55 +697,92 @@ function renderReport() {
         largestExpense
     );
 
-    renderMostFrequentCategory();
+    renderMostFrequentCategory(monthlyTransactions);
 
-    renderPercentageSpent();
+    renderPercentageSpent(monthlyTransactions);
 
     const expensesByCategory =
-        renderExpenseChart();
+    renderExpenseChart(monthlyTransactions);
 
     renderLargestExpenseCategory(
         expensesByCategory
     );
-}
+} // main function that retrieves the transaction for the selected month, check whether it's just income, or empty or normal and calls the appropriate functions to render the report UI accordingly.
+
+
+
+
+// =========================
+// MONTH SELECTION FUNCTIONS
+// =========================
+
+function renderSelectedMonth() {
+    selectedMonthText.textContent =
+        selectedMonth.toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric"
+        });
+} // updates the UI to display the currently selected month in a human-readable format.
+
+
+function getSelectedMonth() {
+    return `${selectedMonth.getFullYear()}-${String(
+        selectedMonth.getMonth() + 1
+    ).padStart(2, '0')}`;
+} // returns the currently selected month in the format "YYYY-MM", which is used to filter transactions for that specific month.
+
+
+function getTransactionsForMonth(month) {
+    return transactionobjects.filter(transaction =>
+        transaction.date.startsWith(month)
+    );
+} // returns a list of transactions that belong to the specified month.
+
+
+function updateNextMonthButton() {
+    const now = new Date();
+
+    nextMonthBtn.disabled =
+        selectedMonth.getFullYear() === now.getFullYear() &&
+        selectedMonth.getMonth() === now.getMonth();
+} // disables the "Next Month" button if the currently selected month is the same as the current month, preventing users from navigating to future months where no transactions can exist.
+
+
+
+
+
 
 
 // =========================
 // EVENT LISTENERS
 // =========================
 
+
+// add transaction overlay event listeners:
+
 addBtn.addEventListener('click', () => {
     overlay1.style.display = 'flex';
-});
+}); // opens the first overlay when the "Add" button is clicked, allowing users to choose between adding an income or expense transaction.
 
 
 closeBtn1.addEventListener('click', () => {
     overlay1.style.display = 'none';
-})
-
-
-closeBtn2.addEventListener('click', () => {
-    overlay2.style.display = 'none';
-})
-
-
-closeBtn3.addEventListener('click', () => {
-    overlay3.style.display = 'none';
-})
+}) // closes the first overlay when the close button is clicked, returning the user to the main dashboard without adding a transaction.
 
 
 addExpenseBtn.addEventListener('click', () => {
     overlay1.style.display = 'none';
     overlay2.style.display = 'flex';
     overlay3.style.display = 'none';
-})
+}) // opens the second overlay for adding an expense transaction when the "Add Expense" button is clicked, while ensuring that the first and third overlays are hidden.
 
 
 addIncomeBtn.addEventListener('click', () => {
     overlay1.style.display = 'none';
     overlay2.style.display = 'none';
     overlay3.style.display = 'flex';
-})
+}) // opens the third overlay for adding an income transaction when the "Add Income" button is clicked, while ensuring that the first and second overlays are hidden.
+
 
 saveBtn2.addEventListener('click', () => {
     addTransaction(
@@ -718,7 +793,13 @@ saveBtn2.addEventListener('click', () => {
         expDateInput,
         overlay2
     );
-});
+}); // saves the expense transaction when the "Save" button is clicked in the second overlay, calling the addTransaction function with the appropriate parameters and closing the overlay afterward.
+
+
+closeBtn2.addEventListener('click', () => {
+    overlay2.style.display = 'none';
+}) // closes the second overlay when the close button is clicked, returning the user to the main dashboard without adding an expense transaction.
+
 
 saveBtn3.addEventListener('click', () => {
     addTransaction(
@@ -729,17 +810,26 @@ saveBtn3.addEventListener('click', () => {
         incDateInput,
         overlay3
     );
-});
+}); // saves the income transaction when the "Save" button is clicked in the third overlay, calling the addTransaction function with the appropriate parameters and closing the overlay afterward.
+
+
+closeBtn3.addEventListener('click', () => {
+    overlay3.style.display = 'none';
+}) // closes the third overlay when the close button is clicked, returning the user to the main dashboard without adding an income transaction.
+
+//=========================
+
+
 
 
 deleteTransactionBtn.addEventListener('click', () => {
-    if (transactionobjects.length === 0) {
+    if (getTransactionsForMonth(getSelectedMonth()).length === 0) {
         alert("No transactions to delete.");
         return;
     }
 
     enterDeleteMode();
-});
+}); // enables delete mode when the "Delete Transaction" button is clicked, allowing users to select transactions for deletion. If there are no transactions, it alerts the user that there are no transactions to delete.
 
 
 reportBtn.addEventListener("click", () => {
@@ -749,26 +839,39 @@ reportBtn.addEventListener("click", () => {
     onlyIncomeMsg.style.display = "none";
     onlyIncome.style.display = "none";
     renderReport();
-});
+}); // displays the report page when the "Report" button is clicked, hides unnecessary UI elements, and calls the renderReport function to generate the report based on the currently selected month and its transactions.
+
 
 dashBtn.addEventListener("click", () => {
     reportPage.style.display = "none";
-});
+}); // hides the report page and returns to the main dashboard when the "Dashboard" button is clicked.
 
 
-// Key-value pairs
-const expenses = {
-    Food: 250,
-    Rent: 900,
-    Transport: 120,
-    Entertainment: 180
-};
+previousMonthBtn.addEventListener("click", () => {
+    selectedMonth.setMonth(selectedMonth.getMonth() - 1);
 
-// Separate keys and values
-const labels = Object.keys(expenses);
-const values = Object.values(expenses);
+    renderSelectedMonth();
+    renderTransactions();
+    updateAndRenderStats();
+    checkNoTransactions();
+    updateNextMonthButton();
+}); // updates the selected month to the previous month when the "Previous Month" button is clicked, and calls functions to update the UI and data accordingly.
 
-// Draw chart
+
+nextMonthBtn.addEventListener("click", () => {
+    selectedMonth.setMonth(selectedMonth.getMonth() + 1);
+
+    renderSelectedMonth();
+    renderTransactions();
+    updateAndRenderStats();
+    checkNoTransactions();
+    updateNextMonthButton();
+}); // updates the selected month to the next month when the "Next Month" button is clicked, and calls functions to update the UI and data accordingly. It also calls a function to ensure that the "Next Month" button is disabled if the selected month is the current month.
+
+
+//========================
+
+//#region CHART SETUP
 const ctx = document.getElementById("myChart");
 Chart.register(ChartDataLabels);
 
@@ -805,8 +908,6 @@ let expenseChart = new Chart(ctx, {
         }
     }
 });
+//#endregion
 
-
-// add sorting of transactions, date features, handle tie in report stats
-
-     
+//======================== 

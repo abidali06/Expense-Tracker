@@ -586,6 +586,10 @@ select:focus {
     position: absolute;
     top: 10%;
 }
+#ltOiDes {
+    font-size: 30px;
+    color: gray;
+}
 #ltNdPer {
     display: flex;
     gap: 1%;
@@ -640,4 +644,13 @@ select:focus {
     text-align: center;
     justify-content: center;
     align-items: center;
+}
+#monthSelector {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: larger;
 }
