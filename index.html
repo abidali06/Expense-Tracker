@@ -15,11 +15,14 @@
                     <h1>Dashboard</h1>
                 </div>
                 <div id="monthSelector">
-                    <button id="previousMonthBtn">&lt;</button>
+                    <div id="cal>">
+                        <button id="previousMonthBtn">&lt;</button>
 
-                    <span id="selectedMonthText">September 2026</span>
+                        <span id="selectedMonthText">September 2026</span>
 
-                    <button id="nextMonthBtn">&gt;</button>
+                        <button id="nextMonthBtn">&gt;</button>
+                    </div>
+                    <div id="transactionCount">transactions: <span id="transactionCountText"></span></div>
                 </div>
             </div>
             <div id="dashboard" class="dash">
@@ -40,7 +43,12 @@
             </div>
             <div id="transaction" class="dash">
                 <div id="transactionTitle">
-                    <div><h2 id="transactionh2">Transactions</h2></div>
+                    <div id="searchTransaction">
+                        <input type="text" id="searchInput" placeholder="Search transactions...">
+                        <button id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        <button id="clearSearchBtn"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div id="transactionh2Div"><h2 id="transactionh2">Transactions</h2></div>
                     <div id ="deleteTransaction">
                         <button id="deletebtn">
                             <i class="fa-solid fa-trash delete-icon"></i>

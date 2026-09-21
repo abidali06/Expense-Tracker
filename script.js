@@ -1,5 +1,9 @@
 //#region DOM ELEMENTS Assignments
+const transactionCountText = document.getElementById("transactionCountText");
 const addBtn = document.getElementById('addbtn');
+const searchBtn = document.getElementById('searchBtn');
+const clearSearchBtn = document.getElementById('clearSearchBtn');
+const searchInput = document.getElementById('searchInput');
 const overlay1 = document.getElementById('overlay1');
 const addIncomeBtn = document.getElementById('aibtn');
 const addExpenseBtn = document.getElementById('aebtn');
@@ -64,10 +68,12 @@ updateNextMonthButton(); // disables the "Next Month" button if the currently se
 
 
 const currency = "₹";
+transactionCountText.textContent = "0";
 balanceamount.textContent = `${currency}0.00`;
 incomeamount.textContent = `${currency}0.00`;
 expensesamount.textContent = `${currency}0.00`;
 
+searchInput.value = "";
 
 let deleteMode = false;
 
@@ -100,11 +106,13 @@ function fetchTransactions() {
 
         transactionobjects.push(...JSON.parse(savedTransactions));
 
-        renderTransactions();
+        monthBasedRenderTransactions();
 
         updateAndRenderStats();
+
+        renderTransactionCount();
     }
-} // also handles rendering and stats update
+} // also handles rendering and stats update and transaction count.
 
 function getTotalExpenses(transactions) {
 
@@ -141,6 +149,15 @@ function getTotalIncome(transactions) {
     return totalIncome;
 }
 
+function renderTransactionCount() {
+
+    const monthlyTransactions =
+        getTransactionsForMonth(getSelectedMonth());
+
+    transactionCountText.textContent =
+        monthlyTransactions.length;
+} // updates the UI to display the number of transactions for the currently selected month.
+
 function getStats(transactions) {
 
     const totalIncome = getTotalIncome(transactions);
@@ -170,14 +187,12 @@ function updateAndRenderStats() {
         `${currency}${totalExpense.toFixed(2)}`;
 } 
 
-function renderTransactions() {
+function renderTransactions(transactionObject) {
 
     transactionList.innerHTML = '';
 
-    const monthlyTransactions =
-        getTransactionsForMonth(getSelectedMonth());
 
-    const sortedTransactions = [...monthlyTransactions].sort(
+    const sortedTransactions = [...transactionObject].sort(
         (a, b) => b.date.localeCompare(a.date)
     );
 
@@ -194,12 +209,42 @@ function renderTransactions() {
                 <div><p class="transactionDescription">${transaction.description}</p></div>
                 <div><p class="transactionDate">${transaction.date}</p></div>
                 <div><p class="transactionAmount ${transaction.type === 'expense' ? 'expenseamount' : 'incomeamount'}">${transaction.type === 'expense' ? '-' : '+'}${currency}${parseFloat(transaction.amount).toFixed(2)}</p></div>
+                <button class="editTransactionBtn" title="Edit transaction"><i class="fa-solid fa-pencil"></i></button>
             </div>
         `;
+        const editBtn = transactionItem.querySelector('.editTransactionBtn');
+
+        editBtn.addEventListener('click', () => {
+            editTransaction(transactionItem);
+        });
 
         transactionList.appendChild(transactionItem);
     });
-} // gets selected month from a function, gets transactions for that month using another function, sorts them by date, and renders them
+} // gets transaction objects, sorts them by date in descending order, creates and appends HTML elements for each transaction to the transaction list in the UI, and applies appropriate styling based on whether the transaction is an income or expense. also adds edit button and its event listener.
+
+
+function monthBasedRenderTransactions() {
+    const monthlyTransactions =
+        getTransactionsForMonth(getSelectedMonth());
+    renderTransactions(monthlyTransactions);
+} // filters the transaction objects for the currently selected month and calls renderTransactions to display them in the UI.
+
+
+function searchBasedRenderTransactions() {
+    const searchItem = searchInput.value.trim();
+    const monthlyTransactions = getTransactionsForMonth(getSelectedMonth());
+    const filteredObject = monthlyTransactions.filter(transaction => {
+        return transaction.category.toLowerCase().includes(searchItem.toLowerCase()) ||
+            transaction.description.toLowerCase().includes(searchItem.toLowerCase());
+    });
+    if (filteredObject.length == 0) {
+        alert("No such transactions exist for this month.")
+        return
+    }
+    renderTransactions(filteredObject);
+} // filters the transaction objects based on the search input and calls renderTransactions to display the matching transactions in the UI.
+
+
 
 function addTransaction(type, amountInput, categoryInput, descriptionInput, dateInput, overlay) {
 
@@ -231,7 +276,8 @@ function addTransaction(type, amountInput, categoryInput, descriptionInput, date
 
     updateLocalStorage();
     updateAndRenderStats();
-    renderTransactions();
+    renderTransactionCount();
+    monthBasedRenderTransactions();
     checkNoTransactions();
 
     amountInput.value = '';
@@ -255,7 +301,76 @@ function checkNoTransactions() {
     }
 } // checks if there are transactions for the selected month and shows or hides the "no transactions" message accordingly.
 
+function editTransaction(transactionItem) {
+            const transaction = transactionobjects.find(
+            transaction => transaction.id === transactionItem.dataset.id
+            );
+            transactionItem.innerHTML = `
+            <div class="transactionDetails">
+                <div>
+                    <input type="text" class="cat" value="${transaction.category}">
+                </div>
 
+                <div>
+                    <input type="text" class="des" value="${transaction.description}">
+                </div>
+
+                <div>
+                    <input type="date" class="date" value="${transaction.date}">
+                </div>
+
+                <div>
+                    <input type="number" class="amount" value="${transaction.amount}">
+                </div>
+                <button class="editConfirmBtn" title="confirm">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+                <button class="editCancelBtn" title="Cancel">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        `;
+            const editConfirmBtn = transactionItem.querySelector('.editConfirmBtn');
+            editConfirmBtn.style.position = 'absolute';
+            editConfirmBtn.style.right = '1.5%';
+            editConfirmBtn.style.background = 'none';
+            editConfirmBtn.style.border = 'none';
+            editConfirmBtn.style.cursor = 'pointer';
+            const editCancelBtn = transactionItem.querySelector('.editCancelBtn');
+            editCancelBtn.style.position = 'absolute';
+            editCancelBtn.style.right = '0%';
+            editCancelBtn.style.background = 'none';
+            editCancelBtn.style.border = 'none';
+            editCancelBtn.style.cursor = 'pointer';
+
+            editCancelBtn.addEventListener('click', () => {
+                monthBasedRenderTransactions();
+            })
+            editConfirmBtn.addEventListener('click', () => {
+            const cat = transactionItem.querySelector('.cat');
+            const des = transactionItem.querySelector('.des');
+            const date = transactionItem.querySelector('.date');
+            const amount = transactionItem.querySelector('.amount');
+
+            const amountValue = parseFloat(amount.value);
+
+            if (isNaN(amountValue) || !cat.value || !des.value || !date.value) {
+                alert("Please fill in all fields correctly.");
+                return;
+            }
+
+            transaction.category = cat.value;
+            transaction.description = des.value;
+            transaction.date = date.value;
+            transaction.amount = amountValue;
+
+            updateLocalStorage();
+            monthBasedRenderTransactions();
+            updateAndRenderStats();
+            checkNoTransactions();
+            renderTransactionCount();
+});
+}
 
 
 // =========================
@@ -324,6 +439,7 @@ function enterDeleteMode() {
         "Click on a transaction to delete it";
 
     toptext.style.color = "red";
+    toptext.style.paddingLeft = "15%";
 
     setupTransactionClickListeners();
     createDeleteControls();
@@ -348,6 +464,7 @@ function cancelDeleteMode() {
 
     toptext.textContent = "Transactions";
     toptext.style.color = "black";
+    toptext.style.paddingLeft = "0";
 
     document.getElementById("confirmDeleteBtn")?.remove();
     document.getElementById("cancelDeleteBtn")?.remove();
@@ -374,8 +491,9 @@ function deleteSelectedTransactions() {
         }
     });
     updateLocalStorage();
-    renderTransactions();
+    monthBasedRenderTransactions();
     updateAndRenderStats();
+    renderTransactionCount();
     cancelDeleteMode();
     checkNoTransactions();
 } // deletes all selected transactions, updates local storage, re-renders the transaction list and stats, cancels delete mode, and checks if there are any transactions left for the selected month to show or hide the "no transactions" message accordingly.
@@ -817,6 +935,17 @@ closeBtn3.addEventListener('click', () => {
     overlay3.style.display = 'none';
 }) // closes the third overlay when the close button is clicked, returning the user to the main dashboard without adding an income transaction.
 
+
+// search functionality event listeners:
+clearSearchBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    monthBasedRenderTransactions();
+}); // clears the search input and re-renders all transactions for the selected month when the "Clear Search" button is clicked, resetting the transaction list in the UI to show all transactions.
+
+
+searchBtn.addEventListener('click', () => {
+    searchBasedRenderTransactions();
+}); // filters and renders transactions based on the search input when the "Search" button is clicked, calling the searchBasedRenderTransactions function to update the transaction list in the UI.
 //=========================
 
 
@@ -851,8 +980,9 @@ previousMonthBtn.addEventListener("click", () => {
     selectedMonth.setMonth(selectedMonth.getMonth() - 1);
 
     renderSelectedMonth();
-    renderTransactions();
+    monthBasedRenderTransactions();
     updateAndRenderStats();
+    renderTransactionCount();
     checkNoTransactions();
     updateNextMonthButton();
 }); // updates the selected month to the previous month when the "Previous Month" button is clicked, and calls functions to update the UI and data accordingly.
@@ -862,8 +992,9 @@ nextMonthBtn.addEventListener("click", () => {
     selectedMonth.setMonth(selectedMonth.getMonth() + 1);
 
     renderSelectedMonth();
-    renderTransactions();
+    monthBasedRenderTransactions();
     updateAndRenderStats();
+    renderTransactionCount();
     checkNoTransactions();
     updateNextMonthButton();
 }); // updates the selected month to the next month when the "Next Month" button is clicked, and calls functions to update the UI and data accordingly. It also calls a function to ensure that the "Next Month" button is disabled if the selected month is the current month.
